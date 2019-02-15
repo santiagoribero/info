@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <steps>
+      
+      <step>
+         <title>1) Download software</title>
+         <description>This step will download all the required software: Visual Basic 6; Visual Basic 6 Service Pack 6; Interop Form Tools; Janus Win Forms; Janus Grid; TeeChart. Please confirm if you want to download it.</description>
+         <internalSteps>
+            <internalStep>
+               <networkFiles>
+                  <networkFile>\\bersv-fs01\Softlib\Teknisk\TeeChart\TeeChart for .Net 4.1 (2011-11-25)\TeeChartNET2011_4.1.2011.10190.exe</networkFile>
+                  <networkFile>\\bersv-fs01\Softlib\cdserver\ComponentSource\Janus WinForms Controls Suite(20110526)\JanusWinFormsV4LicensedSetup.exe</networkFile>
+                  <networkFile>\\bersv-fs01\Softlib\cdserver\ComponentSource\Janus GridEX .NET\Disk1\JanusGridEXV3LicensedSetup.msi</networkFile>
+                  <networkFile>\\bersv-fs01\Softlib\cdserver\Microsoft\visual basic 6.0\en_vb6_ent_cd1.iso</networkFile>
+                  <networkFile>\\bersv-fs01\Softlib\cdserver\Microsoft\visual basic 6.0\en_vb6_ent_cd2.iso</networkFile>
+                  <networkFile>\\bersv-fs01\Softlib\cdserver\Microsoft\visual basic 6.0\product key.txt</networkFile>
+               </networkFiles>
+               <urlFiles>
+                  <urlFile>https://download.microsoft.com/download/f/0/3/f03c202d-1ce4-4267-9393-a8a4b400a982/Vs6sp6B.exe</urlFile>
+                  <urlFile>https://download.microsoft.com/download/3/7/D/37D90824-1BE8-4085-920E-54812C045A55/InteropFormToolsInstaller.msi</urlFile>
+               </urlFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>2) Visual Studio: select Visual C++ compiler and tools from the installation menu</title>
+         <description>The recommended version of Visual Studio to use is 2017, as a Brady developer you should have your own MSDN license that you should use to download the installer. At the time of writing this guide the latest update is 3. You should also select Visual C++ compiler and tools from the installation menu. Install also Visual Studio 2015 if versions earlier (not included) than 2017.2 should be build. Please continue once you have done this.</description>
+      </step>
+
+      <step>
+         <title>3) Microsoft InteropForms Toolkit: Run installer</title>
+         <description>Now you must install Microsoft InteropForms Toolkit, already downloaded in step 1. Please confirm if you want to run the installation.</description>
+         <internalSteps>
+            <internalStep>
+               <runFiles>
+                  <runFile>InteropFormToolsInstaller.msi</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>4) Mount image of Visual Basic 6 installation: Mount</title>
+         <description>Now you must mount the ISO of VB6 and copy its content to the temp folder. An image containing the installer of Visual Basic 6 has been downloaded in the first step. It is required to mount that image and copy its content into a pre-existing partition (because a reboot occurs during the installation and after that reboot the image is not mounted anymore). Please confirm that you want to mount and copy.</description>
+         <internalSteps>
+            <internalStep>
+               <mountIsos>
+                  <mountIso>en_vb6_ent_cd1.iso</mountIso>
+               </mountIsos>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>5) Execute Visual Basic 6 installation: Execute installation</title>
+         <description>Now you must execute the VB6 installation. Please confirm that you want to execute it. The text file containing the license key is going to be opened too. When two options are displayed, select 'VB6 Enterprise Edition'. In the wizard select the 'Custom' option. Clear the 'SourceSafe' and 'Data Access' checkboxes. Decline the installation of MSDN. You don't need any other offered software. Un-check the 'Register Now' checkbox, and click Finish. </description>
+         <internalSteps>
+            <internalStep>
+               <runFiles>
+                  <runFile>product key.txt</runFile>
+                  <runFile>en_vb6_ent_cd1.iso_dir\setup.exe</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>6) Service Pack 6 for Visual Basic 6.0: Unzip</title>
+         <description>Now the Service Pack 6 installer must be extracted. Please confirm that you want to extract it. A location where you want to extract it will be requested. Once extracterd, please close BVB6 (if it is open) and execute setupsp6.exe.</description>
+         <internalSteps>
+            <internalStep>
+               <runFiles>
+                  <runFile>Vs6sp6B.exe</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>7) TeeChart for .NET: Install</title>
+         <description>Now the TeeChart for .NET must be installed. Please confirm if you want to install it. A webpage with the license key is going to be displayed.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://wiki.bradyplc.com/display/DEVG/Teechart+for+.NET+4.1++v2010</displayWebsite>
+               </displayWebsites>
+               <runFiles>
+                  <runFile>TeeChartNET2011_4.1.2011.10190.exe</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>8) Janus WinForms Controls Suite: Install</title>
+         <description>Now the Janus WinForms Controls Suite must be installed. Please confirm if you want to install it. A webpage with the license key is going to be displayed.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://wiki.bradyplc.com/display/DEVG/Janus+WinsForms+ControlSuite+v4</displayWebsite>
+               </displayWebsites>
+               <runFiles>
+                  <runFile>JanusWinFormsV4LicensedSetup.exe</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>9) Janus GridEX .NET: Install</title>
+         <description>Now the Janus GridEX .NET must be installed. Please confirm that you want to extract it. A webpage with the license key is going to be displayed.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://wiki.bradyplc.com/display/DEVG/Janus+Components+-+Grid+EX</displayWebsite>
+               </displayWebsites>
+               <runFiles>
+                  <runFile>JanusGridEXV3LicensedSetup.msi</runFile>
+               </runFiles>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>10) Install Java Development Kit (JDK)</title>
+         <description>Java Development Kit (JDK) must be installed. Please confirm if you want to open the website to download it. At the time of writing this guide the latests major version is 8. If you are using a windows computer that is 64 bit capable you should select the Windows x64 version of the JDK.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>http://www.oracle.com/technetwork/java/javase/downloads/index.html</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>11) Install Windows SDK</title>
+         <description>Windows SDK 10.0.16299 must be installed. Please confirm if you want to open the website to download it.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://go.microsoft.com/fwlink/p/?linkid=864422</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>12) Install ActiveMq</title>
+         <description>You must download and extract ActiveMQ and then configure it as a service. Please confirm if you want to open the website to download it. Once extracted (for example, in Program Files), edit the file bin\win64\wrapper.conf to fill the parameter wrapper.java.command with the full path of the java.exe (including the exe in the path). Then, run bin\win64\InstallService.bat</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>http://www.apache.org/dyn/closer.cgi?filename=/activemq/5.15.8/apache-activemq-5.15.8-bin.zip&action=download</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>13) Windows registry entries</title>
+         <description>Some keys need to be added to the registry. Some .reg files should be executed. Please confirm you want to execute them.</description>
+         <internalSteps>
+            <internalStep>
+               <runRegistries>
+                  <runRegistry>etrmRegEntries.reg</runRegistry>
+               </runRegistries>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>14) Fork the project</title>
+         <description>You can work on original ETRM project but you may prefer working on a fork of it. Please confirm if you want to open the repository location to fork it. If Error 404 is displayed it could just require authentication.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://github.com/BradyPLC/etrm</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>15) Clone the fork</title>
+         <description>You need to clone the fork to your local machine. Please confirm if you want to open the tutorial to learn how to clone it.</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://wiki.bradyplc.com/display/DEVG/Git+-+A+very+basic%2C+getting+started+tutorial</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>16) ComponentOne Enterprise Studio License: Open website with license</title>
+         <description>When compiling the solution you will be requested for a ComponentOne license. Please confirm if you want to open the website to see the license key. You will need it during the first run of ETRM</description>
+         <internalSteps>
+            <internalStep>
+               <displayWebsites>
+                  <displayWebsite>https://wiki.bradyplc.com/display/DEVG/ComponentOne</displayWebsite>
+               </displayWebsites>
+            </internalStep>
+         </internalSteps>
+      </step>
+
+      <step>
+         <title>17) Compile solution in Visual Studio 2017</title>
+         <description>The main solution is etrm\Source\ECS\Elviz.sln. Please continue once you have successfully compiled it.</description>
+      </step>
+
+      <step>
+         <title>18) Building the rest of the ETRM suite</title>
+         <description>To build the product you need to open the Developer Command Prompt for VS2017 (available on the start menu) in admin mode. And run the following commands inside the etrm/source folder: 'emake vb6', 'emake d y' and 'emake ls'. Please continue once you have successfully done it.</description>
+      </step>
+
+      <step>
+         <title>19) Run the client</title>
+         <description>You can start an application from the etrm\bin folder, to see if everything is working as expected (ElvizETRMClient.exe for example). Please continue once you have successfully done it.</description>
+      </step>
+
+
+   </steps>
+</root>

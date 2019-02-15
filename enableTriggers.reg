@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\Debugflags]
+"DisableTriggers"=dword:00000000
