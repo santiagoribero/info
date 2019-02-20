@@ -1,10 +1,10 @@
-IF NOT EXISTS ( SELECT 1 FROM DAILY_QAPrices191.dbo.InstallShield WHERE ISSchema = '2017.1.1.02' )
+IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAPrices191].[dbo].InstallShield WHERE ISSchema = '2017.1.1.02' )
 BEGIN
 	THROW 50001, 'The script cannot run in Prices versions prior to 2017.1.1.02', 1
 END
 
-if not exists (select * from sysobjects where name='ELVIZ14214ProductsBkp' and xtype='U')
-CREATE TABLE [dbo].[ELVIZ14214ProductsBkp](
+if not exists (select * from [DAILY_QAPrices191].[dbo].sysobjects where name='ELVIZ14214ProductsBkp' and xtype='U')
+CREATE TABLE [DAILY_QAPrices191].[dbo].[ELVIZ14214ProductsBkp](
 	[ProdId] [int] NOT NULL,
 	[ProdName] [varchar](255) NOT NULL,
 	[TypeId] [int] NOT NULL,
@@ -33,8 +33,8 @@ CREATE TABLE [dbo].[ELVIZ14214ProductsBkp](
 	[NewProdId] [int] NOT NULL
 	)
 
-if not exists (select * from sysobjects where name='ELVIZ14214PricesBkp' and xtype='U')
-CREATE TABLE [dbo].[ELVIZ14214PricesBkp](
+if not exists (select * from [DAILY_QAPrices191].[dbo].sysobjects where name='ELVIZ14214PricesBkp' and xtype='U')
+CREATE TABLE [DAILY_QAPrices191].[dbo].[ELVIZ14214PricesBkp](
 	[TradeDate] [datetime] NOT NULL,
 	[ProdId] [int] NOT NULL,
 	[TypeId] [int] NOT NULL,
@@ -62,10 +62,10 @@ BEGIN TRY
 		AS
 		(
 			SELECT MAX(p.ProdId) [ProdId], p.[ProdName], p.[TypeId], p.[CommodityId], p.[ExecutionVenueId], p.[AreaId], p.[LoadTypeId], p.[DeliveryTypeId], p.[CfdBaseAreaId], p.[ProductVenueId], p.[IsCall], p.[Strike], p.[FutureTypeId], p.[PublishingPeriodTypeId], pc.[ProductCodeTypeId], pc.[Code]
-			FROM dbo.Products p
-			LEFT JOIN dbo.ProductCodes pc
+			FROM [DAILY_QAPrices191].[dbo].Products p
+			LEFT JOIN [DAILY_QAPrices191].[dbo].ProductCodes pc
 			ON p.ProdId = pc.ProductId
-			JOIN DataSources ds
+			JOIN [DAILY_QAPrices191].[dbo].DataSources ds
 			ON ds.SourceId = p.SourceId
 			JOIN (
 
@@ -78,10 +78,10 @@ BEGIN TRY
 						THEN 2
 						ELSE 1
 						END) as SourcePriority
-					FROM dbo.Products p2
-					LEFT JOIN dbo.ProductCodes pc2
+					FROM [DAILY_QAPrices191].[dbo].Products p2
+					LEFT JOIN [DAILY_QAPrices191].[dbo].ProductCodes pc2
 					ON p2.ProdId = pc2.ProductId
-					JOIN DataSources ds2
+					JOIN [DAILY_QAPrices191].[dbo].DataSources ds2
 					ON ds2.SourceId = p2.SourceId
 
 					GROUP BY p2.[ProdName], p2.[TypeId], p2.[CommodityId], p2.[ExecutionVenueId], p2.[AreaId], p2.[LoadTypeId], p2.[DeliveryTypeId], p2.[CfdBaseAreaId], p2.[ProductVenueId], p2.[IsCall], p2.[Strike], p2.[FutureTypeId], p2.[PublishingPeriodTypeId], pc2.[ProductCodeTypeId], pc2.[Code]
@@ -117,8 +117,8 @@ BEGIN TRY
 		)
 		insert into @duplicates (ProdId, FirstProdId)
 		SELECT p.ProdId, fi.ProdId
-		FROM Products p
-		LEFT JOIN dbo.ProductCodes pc
+		FROM [DAILY_QAPrices191].[dbo].Products p
+		LEFT JOIN [DAILY_QAPrices191].[dbo].ProductCodes pc
 		ON p.ProdId = pc.ProductId
 		JOIN FirstInstance fi
 		ON (
@@ -141,14 +141,14 @@ BEGIN TRY
 		)
 
 
-		INSERT INTO ELVIZ14214PricesBkp ([TradeDate], [ProdId], [TypeId], [Value], [SourceId], [TimeStamp], [CurrencyId], [ProcessedAt], [NewProdId])
+		INSERT INTO [DAILY_QAPrices191].[dbo].ELVIZ14214PricesBkp ([TradeDate], [ProdId], [TypeId], [Value], [SourceId], [TimeStamp], [CurrencyId], [ProcessedAt], [NewProdId])
 		SELECT [TradeDate], p.[ProdId], [TypeId], [Value], [SourceId], [TimeStamp], [CurrencyId], GetUtcDate(), d.FirstProdId
 		FROM Prices p
 		JOIN @duplicates d
 		ON p.ProdId = d.ProdId
 
 
-		INSERT INTO ELVIZ14214ProductsBkp ([ProdId], [ProdName], [TypeId], [LastTradeDate], [FromDate], [ToDate], [Hours], [SourceId], [CommodityId], [PriceUnitId], [TimeStamp], [ExecutionVenueId], [AreaId], [LoadTypeId], [FirstTradeDate], [DeliveryTypeId], [CfdBaseAreaId], [ProductVenueId], [IsCall], [Strike], [FutureTypeId], [PublishingPeriodTypeId], [ProductCodeTypeId], [Code], [ProcessedAt], [NewProdId])
+		INSERT INTO [DAILY_QAPrices191].[dbo].ELVIZ14214ProductsBkp ([ProdId], [ProdName], [TypeId], [LastTradeDate], [FromDate], [ToDate], [Hours], [SourceId], [CommodityId], [PriceUnitId], [TimeStamp], [ExecutionVenueId], [AreaId], [LoadTypeId], [FirstTradeDate], [DeliveryTypeId], [CfdBaseAreaId], [ProductVenueId], [IsCall], [Strike], [FutureTypeId], [PublishingPeriodTypeId], [ProductCodeTypeId], [Code], [ProcessedAt], [NewProdId])
 		SELECT p.[ProdId], p.[ProdName], p.[TypeId], p.[LastTradeDate], p.[FromDate], p.[ToDate], p.[Hours], p.[SourceId], p.[CommodityId], p.[PriceUnitId], p.[TimeStamp], p.[ExecutionVenueId], p.[AreaId], p.[LoadTypeId], p.[FirstTradeDate], p.[DeliveryTypeId], p.[CfdBaseAreaId], p.[ProductVenueId], p.[IsCall], p.[Strike], p.[FutureTypeId], p.[PublishingPeriodTypeId], pc.[ProductCodeTypeId], pc.[Code], GetUtcDate(), d.FirstProdId
 		FROM Products p
 		LEFT JOIN dbo.ProductCodes pc
@@ -157,13 +157,13 @@ BEGIN TRY
 		ON p.ProdId = d.ProdId
 
 
-		INSERT INTO Prices ([ProdId],[TradeDate],[TypeId],[Value],[SourceId],[TimeStamp],[CurrencyId])
+		INSERT INTO [DAILY_QAPrices191].[dbo].Prices ([ProdId],[TradeDate],[TypeId],[Value],[SourceId],[TimeStamp],[CurrencyId])
 		SELECT subquery.FirstProdId, p3.[TradeDate], p3.[TypeId], p3.[Value], p3.[SourceId], p3.[TimeStamp], p3.[CurrencyId]
 		FROM Prices p3
 		JOIN
 		(
 			SELECT d.FirstProdId, p.TypeId, p.TradeDate, MAX(p.ProdId) ProdId
-			FROM Prices p
+			FROM [DAILY_QAPrices191].[dbo].Prices p
 			JOIN @duplicates d
 			ON d.ProdId = p.ProdId
 			WHERE NOT EXISTS
@@ -181,13 +181,13 @@ BEGIN TRY
 			AND p3.TradeDate = subquery.TradeDate)
 		
 		
-		DELETE Prices
+		DELETE [DAILY_QAPrices191].[dbo].Prices
 		WHERE ProdId IN ( SELECT ProdId FROM @duplicates )
 
-		DELETE ProductCodes
+		DELETE [DAILY_QAPrices191].[dbo].ProductCodes
 		WHERE ProductId IN ( SELECT ProdId FROM @duplicates )
 
-		DELETE Products
+		DELETE [DAILY_QAPrices191].[dbo].Products
 		WHERE ProdId IN ( SELECT ProdId FROM @duplicates )
 		
 

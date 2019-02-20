@@ -1,12 +1,12 @@
-IF NOT EXISTS ( SELECT 1 FROM DAILY_QAECM191.dbo.InstallShield WHERE ISSchema = '2017.1.1.06' )
+IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.1.1.06' )
 BEGIN
 	THROW 50001, 'The script cannot run in ECM versions prior to 2017.1.1.06', 1
 END
 
 
 
-if not exists (select * from sysobjects where name='ELVIZ14213PublishingPeriodTypeIdBkp' and xtype='U')
-	CREATE TABLE [dbo].[ELVIZ14213PublishingPeriodTypeIdBkp](
+if not exists (select * from [DAILY_QAECM191].[dbo].sysobjects where name='ELVIZ14213PublishingPeriodTypeIdBkp' and xtype='U')
+	CREATE TABLE [DAILY_QAECM191].[dbo].[ELVIZ14213PublishingPeriodTypeIdBkp](
 		[InstrumentId] [int] NOT NULL,
 		[PublishingPeriodTypeId] [int] NULL,
 		[NewPublishingPeriodTypeId] [int] NOT NULL,
@@ -21,14 +21,14 @@ BEGIN TRY
 
 		BEGIN TRAN
 
-		UPDATE Instruments
+		UPDATE [DAILY_QAECM191].[dbo].Instruments
 		SET PublishingPeriodTypeId = newPublishingPeriodTypeId.PeriodTypeId
 		OUTPUT inserted.InstrumentId, deleted.PublishingPeriodTypeId, inserted.PublishingPeriodTypeId, GetUTCDate()
-		INTO ELVIZ14213PublishingPeriodTypeIdBkp
+		INTO [DAILY_QAECM191].[dbo].ELVIZ14213PublishingPeriodTypeIdBkp
 		FROM 
 		(
 			select InstrumentId, MIN(patterns.PeriodTypeId) PeriodTypeId
-			FROM Instruments i
+			FROM [DAILY_QAECM191].[dbo].Instruments i
 			JOIN
 			(
 				select distinct pt.PeriodTypeId, fc.CommodityId, 
@@ -43,8 +43,8 @@ BEGIN TRY
 					'{dd}', '[0-9][0-9]'),
 					'{dd:periodstart}', '[0-9][0-9]'),
 					'{y}', '[0-9]') pattern
-				from FutureConfiguration fc
-				JOIN PeriodTypes pt
+				from [DAILY_QAECM191].[dbo].FutureConfiguration fc
+				JOIN [DAILY_QAECM191].[dbo].PeriodTypes pt
 				on fc.Period = pt.Name
 			) patterns
 			on (i.InstrumentName like patterns.pattern and i.CommodityId = patterns.CommodityId)
@@ -53,7 +53,7 @@ BEGIN TRY
 			group by InstrumentId
 			having count(*) = 1 --UPDATE ONLY if it is clear which one is the PeriodTypeId for the Instrument
 		) newPublishingPeriodTypeId
-		JOIN Instruments i
+		JOIN [DAILY_QAECM191].[dbo].Instruments i
 		ON (i.InstrumentId = newPublishingPeriodTypeId.InstrumentId)
 
 		COMMIT TRAN
