@@ -306,6 +306,9 @@ BEGIN TRY
 		WHERE InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
+		OR UnderlyingInstrumentID (
+			SELECT InstrumentId from @duplicates
+		)
 
 		INSERT INTO [DAILY_QAECM191].[dbo].ELVIZ14214InstrumentsBkp ([InstrumentId], [InstrumentName], [InstrumentShortName], [InstrumentTypeId], [StatusId], [ExecutionVenueId], [CommodityId], [ExpiryOffset], [StripPeriodResolution], [BarrierOptionTypeId], [FromDate], [ToDate], [ExpiryDate], [Strike], [SamplingPeriodId], [PutCall], [Hours], [BaseCurrencyId], [CrossCurrencyId], [BookPriceTypeId], [CapFloorPricingPeriodTypeId], [FutureTypeId], [DeliveryTypeId], [ExpiryTime], [LoadProfileId], [PriceBasisId], [SamplingFrom], [SamplingTo], [SwapPriceTypeId], [TimeZoneId], [UnderlyingInstrumentId], [CurrencyId], [CurrencySourceId], [TU_Id], [PriceUnitId], [Payout], [LowerTrigger], [UpperTrigger], [TriggerCurrencyId], [MarketPriceFactor], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [EnvironmentLabelId], [IndexedPriceBookTemplateId], [PriceBasisToAreaId], [ModelTypeId], [MinVol], [MaxVol], [FixPrice], [Threshold], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [PublishingPeriodTypeId], [ProductionFacilityId], [CertificateTypeId], [DateOfTransfer], [ProcessedAt])
 		SELECT i.[InstrumentId], [InstrumentName], [InstrumentShortName], [InstrumentTypeId], [StatusId], [ExecutionVenueId], [CommodityId], [ExpiryOffset], [StripPeriodResolution], [BarrierOptionTypeId], [FromDate], [ToDate], [ExpiryDate], [Strike], [SamplingPeriodId], [PutCall], [Hours], [BaseCurrencyId], [CrossCurrencyId], [BookPriceTypeId], [CapFloorPricingPeriodTypeId], [FutureTypeId], [DeliveryTypeId], [ExpiryTime], [LoadProfileId], [PriceBasisId], [SamplingFrom], [SamplingTo], [SwapPriceTypeId], [TimeZoneId], [UnderlyingInstrumentId], [CurrencyId], [CurrencySourceId], [TU_Id], [PriceUnitId], [Payout], [LowerTrigger], [UpperTrigger], [TriggerCurrencyId], [MarketPriceFactor], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [EnvironmentLabelId], [IndexedPriceBookTemplateId], [PriceBasisToAreaId], [ModelTypeId], [MinVol], [MaxVol], [FixPrice], [Threshold], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [PublishingPeriodTypeId], ic.[ProductionFacilityId], ic.[CertificateTypeId], ic.[DateOfTransfer], GetUTCDate()
@@ -321,6 +324,12 @@ BEGIN TRY
 		FROM [DAILY_QAECM191].[dbo].Transactions t
 		JOIN @duplicates d
 		ON t.InstrumentId = d.InstrumentId
+
+		UPDATE [DAILY_QAECM191].[dbo].Transactions
+		SET UnderlyingInstrumentId = d.FirstInstrumentId
+		FROM [DAILY_QAECM191].[dbo].Transactions t
+		JOIN @duplicates d
+		ON t.UnderlyingInstrumentId = d.InstrumentId
 
 
 		DELETE [DAILY_QAECM191].[dbo].InstrumentCertificates where InstrumentId IN (
