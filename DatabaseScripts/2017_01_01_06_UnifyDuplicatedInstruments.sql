@@ -1,3 +1,8 @@
+IF EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.2.1.06' )
+BEGIN
+	THROW 50001, 'The version of this ECM database is later than 2017.2.1.06. Run a compatible version of this script', 1
+END
+
 IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.1.1.06' )
 BEGIN
 	THROW 50001, 'The script cannot run in ECM versions prior to 2017.1.1.06', 1
