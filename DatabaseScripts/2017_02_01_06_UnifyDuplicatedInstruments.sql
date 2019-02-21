@@ -1,6 +1,6 @@
-IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.1.1.06' )
+IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.2.1.06' )
 BEGIN
-	THROW 50001, 'The script cannot run in ECM versions prior to 2017.1.1.06', 1
+	THROW 50001, 'The script cannot run in ECM versions prior to 2017.2.1.06. Run a compatible version of this script', 1
 END
 
 
@@ -306,7 +306,7 @@ BEGIN TRY
 		WHERE InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
-		OR UnderlyingInstrumentID (
+		OR UnderlyingInstrumentID IN (
 			SELECT InstrumentId from @duplicates
 		)
 
