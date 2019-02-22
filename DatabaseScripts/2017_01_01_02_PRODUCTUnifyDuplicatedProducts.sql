@@ -3,6 +3,11 @@ BEGIN
 	THROW 50001, 'The script cannot run in Prices versions prior to 2017.1.1.02', 1
 END
 
+if ('2018.2.1.01' < (SELECT MAX(IISchema) FROM [DAILY_QAPrices191].[dbo].InstallShield) OR '2019.1.0.03' < (SELECT MAX(IISchema) FROM [DAILY_QAECM191].[dbo].InstallShield))
+BEGIN
+	THROW 50001, 'The script was not verified with this version of the database. Please confirm the compatibility with a developer', 1
+END
+
 if not exists (select * from [DAILY_QAPrices191].[dbo].sysobjects where name='ELVIZ14214ProductsBkp' and xtype='U')
 CREATE TABLE [DAILY_QAPrices191].[dbo].[ELVIZ14214ProductsBkp](
 	[ProdId] [int] NOT NULL,
