@@ -143,15 +143,15 @@ BEGIN TRY
 
 		INSERT INTO [DAILY_QAPrices191].[dbo].ELVIZ14214PricesBkp ([TradeDate], [ProdId], [TypeId], [Value], [SourceId], [TimeStamp], [CurrencyId], [ProcessedAt], [NewProdId])
 		SELECT [TradeDate], p.[ProdId], [TypeId], [Value], [SourceId], [TimeStamp], [CurrencyId], GetUtcDate(), d.FirstProdId
-		FROM Prices p
+		FROM [DAILY_QAPrices191].[dbo].Prices p
 		JOIN @duplicates d
 		ON p.ProdId = d.ProdId
 
 
 		INSERT INTO [DAILY_QAPrices191].[dbo].ELVIZ14214ProductsBkp ([ProdId], [ProdName], [TypeId], [LastTradeDate], [FromDate], [ToDate], [Hours], [SourceId], [CommodityId], [PriceUnitId], [TimeStamp], [ExecutionVenueId], [AreaId], [LoadTypeId], [FirstTradeDate], [DeliveryTypeId], [CfdBaseAreaId], [ProductVenueId], [IsCall], [Strike], [FutureTypeId], [PublishingPeriodTypeId], [ProductCodeTypeId], [Code], [ProcessedAt], [NewProdId])
 		SELECT p.[ProdId], p.[ProdName], p.[TypeId], p.[LastTradeDate], p.[FromDate], p.[ToDate], p.[Hours], p.[SourceId], p.[CommodityId], p.[PriceUnitId], p.[TimeStamp], p.[ExecutionVenueId], p.[AreaId], p.[LoadTypeId], p.[FirstTradeDate], p.[DeliveryTypeId], p.[CfdBaseAreaId], p.[ProductVenueId], p.[IsCall], p.[Strike], p.[FutureTypeId], p.[PublishingPeriodTypeId], pc.[ProductCodeTypeId], pc.[Code], GetUtcDate(), d.FirstProdId
-		FROM Products p
-		LEFT JOIN dbo.ProductCodes pc
+		FROM [DAILY_QAPrices191].[dbo].Products p
+		LEFT JOIN [DAILY_QAPrices191].[dbo].ProductCodes pc
 		ON p.ProdId = pc.ProductId
 		JOIN @duplicates d
 		ON p.ProdId = d.ProdId
@@ -159,7 +159,7 @@ BEGIN TRY
 
 		INSERT INTO [DAILY_QAPrices191].[dbo].Prices ([ProdId],[TradeDate],[TypeId],[Value],[SourceId],[TimeStamp],[CurrencyId])
 		SELECT subquery.FirstProdId, p3.[TradeDate], p3.[TypeId], p3.[Value], p3.[SourceId], p3.[TimeStamp], p3.[CurrencyId]
-		FROM Prices p3
+		FROM [DAILY_QAPrices191].[dbo].Prices p3
 		JOIN
 		(
 			SELECT d.FirstProdId, p.TypeId, p.TradeDate, MAX(p.ProdId) ProdId
@@ -169,7 +169,7 @@ BEGIN TRY
 			WHERE NOT EXISTS
 			(
 				SELECT 1
-				FROM Prices p2
+				FROM [DAILY_QAPrices191].[dbo].Prices p2
 				WHERE p2.ProdId = d.FirstProdId
 				AND p2.TypeId = p.TypeId
 				AND p2.TradeDate = p.TradeDate
