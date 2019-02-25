@@ -3,7 +3,7 @@ BEGIN
 	THROW 50001, 'The script cannot run in ECM versions prior to 2017.2.1.06. Run a compatible version of this script', 1
 END
 
-if ('2019.1.0.03' < (SELECT MAX(IISchema) FROM [DAILY_QAECM191].[dbo].InstallShield))
+if ('2019.1.0.03' < (SELECT MAX(ISSchema) FROM [DAILY_QAECM191].[dbo].InstallShield))
 BEGIN
 	THROW 50001, 'The script was not verified with this version of the database. Please confirm the compatibility with a developer', 1
 END
