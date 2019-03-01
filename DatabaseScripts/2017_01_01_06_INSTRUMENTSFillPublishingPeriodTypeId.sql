@@ -49,7 +49,14 @@ BEGIN TRY
 					'{y}', '[0-9]') pattern
 				from [DAILY_QAECM191].[dbo].FutureConfiguration fc
 				JOIN [DAILY_QAECM191].[dbo].PeriodTypes pt
-				on fc.Period = pt.Name
+				on pt.Name = CASE fc.Period
+					WHEN 'Unknown' THEN NULL
+					WHEN 'WeekEnd' THEN NULL
+					WHEN 'WorkDayWeek' THEN NULL
+					WHEN 'WorkDay' THEN 'Day'
+					WHEN 'CoalMonth' THEN 'Month'
+					ELSE fc.Period
+					END
 			) patterns
 			on (i.InstrumentName like patterns.pattern and i.CommodityId = patterns.CommodityId)
 			where i.InstrumentTypeId = 2 --UPDATE ONLY Future Instruments
