@@ -1,0 +1,10 @@
+select r.Name Commodity, v.Name Venue, pb.PriceBasisName, fc.DisplayTickerRule, fc.Period
+from FutureConfiguration fc
+LEFT JOIN Venues v
+ON fc.VenueId = v.VenueId
+LEFT JOIN Commodities c
+ON fc.CommodityId = c.CommodityId
+LEFT JOIN Resources r
+ON c.ResourceId = r.ResourceId
+LEFT JOIN PriceBasis pb
+ON fc.PriceBasisId = pb.PriceBasisId
