@@ -24,8 +24,8 @@ popd
 Write-Host "`nVisual Studio 2017 Command Prompt variables set." -ForegroundColor Yellow
 
 # Emake
-cmd /c $loc\Source\emake.bat d y
-cmd /c $loc\Source\emake.bat vb6
+cmd /c $loc\Source\emake d y
+cmd /c $loc\Source\emake vb6
 
 #Run ETRM services
 invoke-expression "cmd /c start powershell -Command { $loc\Bin\EFM.ServerApplication.exe }"
