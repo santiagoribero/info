@@ -1,16 +1,22 @@
-IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.1.1.06' )
+--In Management Studio, enable Query --> SQLCMD Mode
+
+
+:setvar ECMdbname "P11ECM"
+
+
+IF NOT EXISTS ( SELECT 1 FROM $(ECMdbname).[dbo].InstallShield WHERE ISSchema = '2017.1.1.06' )
 BEGIN
 	THROW 50001, 'The script cannot run in ECM versions prior to 2017.1.1.06', 1
 END
 
-if ('2018.2.1.01' < (SELECT MAX(ISSchema) FROM [DAILY_QAPrices191].[dbo].InstallShield) OR '2019.1.0.03' < (SELECT MAX(ISSchema) FROM [DAILY_QAECM191].[dbo].InstallShield))
+if ('2019.1.0.03' < (SELECT MAX(ISSchema) FROM $(ECMdbname).[dbo].InstallShield))
 BEGIN
 	THROW 50001, 'The script was not verified with this version of the database. Please confirm the compatibility with a developer', 1
 END
 
 
-if not exists (select * from [DAILY_QAECM191].[dbo].sysobjects where name='ELVIZ14213PublishingPeriodTypeIdBkp' and xtype='U')
-	CREATE TABLE [DAILY_QAECM191].[dbo].[ELVIZ14213PublishingPeriodTypeIdBkp](
+if not exists (select * from $(ECMdbname).[dbo].sysobjects where name='ELVIZ14213PublishingPeriodTypeIdBkp' and xtype='U')
+	CREATE TABLE $(ECMdbname).[dbo].[ELVIZ14213PublishingPeriodTypeIdBkp](
 		[InstrumentId] [int] NOT NULL,
 		[PublishingPeriodTypeId] [int] NULL,
 		[NewPublishingPeriodTypeId] [int] NOT NULL,
@@ -25,14 +31,14 @@ BEGIN TRY
 
 		BEGIN TRAN
 
-		UPDATE [DAILY_QAECM191].[dbo].Instruments
+		UPDATE $(ECMdbname).[dbo].Instruments
 		SET PublishingPeriodTypeId = newPublishingPeriodTypeId.PeriodTypeId
 		OUTPUT inserted.InstrumentId, deleted.PublishingPeriodTypeId, inserted.PublishingPeriodTypeId, GetUTCDate()
-		INTO [DAILY_QAECM191].[dbo].ELVIZ14213PublishingPeriodTypeIdBkp
+		INTO $(ECMdbname).[dbo].ELVIZ14213PublishingPeriodTypeIdBkp
 		FROM 
 		(
 			select InstrumentId, MIN(patterns.PeriodTypeId) PeriodTypeId
-			FROM [DAILY_QAECM191].[dbo].Instruments i
+			FROM $(ECMdbname).[dbo].Instruments i
 			JOIN
 			(
 				select distinct pt.PeriodTypeId, fc.CommodityId, 
@@ -47,8 +53,8 @@ BEGIN TRY
 					'{dd}', '[0-9][0-9]'),
 					'{dd:periodstart}', '[0-9][0-9]'),
 					'{y}', '[0-9]') pattern
-				from [DAILY_QAECM191].[dbo].FutureConfiguration fc
-				JOIN [DAILY_QAECM191].[dbo].PeriodTypes pt
+				from $(ECMdbname).[dbo].FutureConfiguration fc
+				JOIN $(ECMdbname).[dbo].PeriodTypes pt
 				on pt.Name = CASE fc.Period
 					WHEN 'Unknown' THEN NULL
 					WHEN 'WeekEnd' THEN NULL
@@ -64,7 +70,7 @@ BEGIN TRY
 			group by InstrumentId
 			having count(*) = 1 --UPDATE ONLY if it is clear which one is the PeriodTypeId for the Instrument
 		) newPublishingPeriodTypeId
-		JOIN [DAILY_QAECM191].[dbo].Instruments i
+		JOIN $(ECMdbname).[dbo].Instruments i
 		ON (i.InstrumentId = newPublishingPeriodTypeId.InstrumentId)
 
 		COMMIT TRAN

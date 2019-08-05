@@ -1,16 +1,25 @@
-IF NOT EXISTS ( SELECT 1 FROM [DAILY_QAECM191].[dbo].InstallShield WHERE ISSchema = '2017.2.1.06' )
+--In Management Studio, enable Query --> SQLCMD Mode
+
+
+:setvar ECMdbname "P11ECM" 
+:setvar Pricesdbname "P11Prices"
+
+
+
+
+IF NOT EXISTS ( SELECT 1 FROM $(ECMdbname).[dbo].InstallShield WHERE ISSchema = '2017.2.1.06' )
 BEGIN
 	THROW 50001, 'The script cannot run in ECM versions prior to 2017.2.1.06. Run a compatible version of this script', 1
 END
 
-if ('2019.1.0.03' < (SELECT MAX(ISSchema) FROM [DAILY_QAECM191].[dbo].InstallShield))
+if ('2019.1.0.03' < (SELECT MAX(ISSchema) FROM $(ECMdbname).[dbo].InstallShield))
 BEGIN
 	THROW 50001, 'The script was not verified with this version of the database. Please confirm the compatibility with a developer', 1
 END
 
 
-if not exists (select * from [DAILY_QAECM191].[dbo].sysobjects where name='ELVIZ14214TransactionsBkp' and xtype='U')
-CREATE TABLE [DAILY_QAECM191].[dbo].[ELVIZ14214TransactionsBkp](
+if not exists (select * from $(ECMdbname).[dbo].sysobjects where name='ELVIZ14214TransactionsBkp' and xtype='U')
+CREATE TABLE $(ECMdbname).[dbo].[ELVIZ14214TransactionsBkp](
 	[Id] [int] NOT NULL,
 	[TradeDate] [datetime] NOT NULL,
 	[TradeTime] [datetime] NOT NULL,
@@ -136,8 +145,8 @@ CREATE TABLE [DAILY_QAECM191].[dbo].[ELVIZ14214TransactionsBkp](
 ) ON [PRIMARY]
 
 
-if not exists (select * from [DAILY_QAECM191].[dbo].sysobjects where name='ELVIZ14214InstrumentsBkp' and xtype='U')
-CREATE TABLE [DAILY_QAECM191].[dbo].[ELVIZ14214InstrumentsBkp](
+if not exists (select * from $(ECMdbname).[dbo].sysobjects where name='ELVIZ14214InstrumentsBkp' and xtype='U')
+CREATE TABLE $(ECMdbname).[dbo].[ELVIZ14214InstrumentsBkp](
 	[InstrumentId] [int] NOT NULL,
 	[InstrumentName] [varchar](50) NULL,
 	[InstrumentShortName] [varchar](15) NULL,
@@ -216,23 +225,23 @@ BEGIN TRY
 		AS
 		(
 			SELECT MIN(i.InstrumentId) [InstrumentId], i.[InstrumentName], i.[InstrumentShortName], i.[InstrumentTypeId], i.[StatusId], i.[ExecutionVenueId], i.[CommodityId], COALESCE(i.[ExpiryOffset], 0), i.[StripPeriodResolution], i.[BarrierOptionTypeId], i.[FromDate], i.[ToDate], i.[ExpiryDate], i.[Strike], i.[SamplingPeriodId], i.[PutCall], i.[Hours], i.[BaseCurrencyId], i.[CrossCurrencyId], i.[BookPriceTypeId], i.[CapFloorPricingPeriodTypeId], i.[FutureTypeId], i.[DeliveryTypeId], i.[ExpiryTime], i.[LoadProfileId], i.[PriceBasisId], i.[SamplingFrom], i.[SamplingTo], i.[SwapPriceTypeId], i.[TimeZoneId], i.[UnderlyingInstrumentId], i.[CurrencyId], i.[CurrencySourceId], i.[TU_Id], i.[PriceUnitId], i.[Payout], i.[LowerTrigger], i.[UpperTrigger], i.[TriggerCurrencyId], i.[MarketPriceFactor], i.[SettlementRuleId], i.[InterconnectorId], i.[Interruptible], i.[UserSpecifiedName], i.[EnvironmentLabelId], i.[IndexedPriceBookTemplateId], i.[PriceBasisToAreaId], i.[ModelTypeId], i.[MinVol], i.[MaxVol], i.[FixPrice], i.[Threshold], i.[HistoricContractPriceSeriesId], i.[HistoricMarketPriceSeriesId], i.[ReferencePriceSeriesId], i.[DestinationReferencePriceSeriesId], i.[PublishingPeriodTypeId], ProductionFacilityId, CertificateTypeId, DateOfTransfer
-			FROM [DAILY_QAECM191].[dbo].Instruments i
-			LEFT JOIN [DAILY_QAECM191].[dbo].InstrumentCertificates ic
+			FROM $(ECMdbname).[dbo].Instruments i
+			LEFT JOIN $(ECMdbname).[dbo].InstrumentCertificates ic
 			ON i.InstrumentId = ic.InstrumentId
 			WHERE i.UnderlyingInstrumentId IS NULL --I'll only unify instruments that don't have an underlying instrument
-			AND i.InstrumentId NOT IN ( SELECT InstrumentId FROM [DAILY_QAECM191].[dbo].Authorisations ) --I'll only unify instruments without Authorisations
-			AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyBools ) --I'll only unify instruments without PropertyBools
-			AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyDates ) --I'll only unify instruments without PropertyDates
-			AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyFloats ) --I'll only unify instruments without PropertyFloats
-			AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyIntegers ) --I'll only unify instruments without PropertyIntegers
-			AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyStrings ) --I'll only unify instruments without PropertyStrings
+			AND i.InstrumentId NOT IN ( SELECT InstrumentId FROM $(ECMdbname).[dbo].Authorisations ) --I'll only unify instruments without Authorisations
+			AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyBools ) --I'll only unify instruments without PropertyBools
+			AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyDates ) --I'll only unify instruments without PropertyDates
+			AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyFloats ) --I'll only unify instruments without PropertyFloats
+			AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyIntegers ) --I'll only unify instruments without PropertyIntegers
+			AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyStrings ) --I'll only unify instruments without PropertyStrings
 			GROUP BY i.[InstrumentName], i.[InstrumentShortName], i.[InstrumentTypeId], i.[StatusId], i.[ExecutionVenueId], i.[CommodityId], COALESCE(i.[ExpiryOffset], 0), i.[StripPeriodResolution], i.[BarrierOptionTypeId], i.[FromDate], i.[ToDate], i.[ExpiryDate], i.[Strike], i.[SamplingPeriodId], i.[PutCall], i.[Hours], i.[BaseCurrencyId], i.[CrossCurrencyId], i.[BookPriceTypeId], i.[CapFloorPricingPeriodTypeId], i.[FutureTypeId], i.[DeliveryTypeId], i.[ExpiryTime], i.[LoadProfileId], i.[PriceBasisId], i.[SamplingFrom], i.[SamplingTo], i.[SwapPriceTypeId], i.[TimeZoneId], i.[UnderlyingInstrumentId], i.[CurrencyId], i.[CurrencySourceId], i.[TU_Id], i.[PriceUnitId], i.[Payout], i.[LowerTrigger], i.[UpperTrigger], i.[TriggerCurrencyId], i.[MarketPriceFactor], i.[SettlementRuleId], i.[InterconnectorId], i.[Interruptible], i.[UserSpecifiedName], i.[EnvironmentLabelId], i.[IndexedPriceBookTemplateId], i.[PriceBasisToAreaId], i.[ModelTypeId], i.[MinVol], i.[MaxVol], i.[FixPrice], i.[Threshold], i.[HistoricContractPriceSeriesId], i.[HistoricMarketPriceSeriesId], i.[ReferencePriceSeriesId], i.[DestinationReferencePriceSeriesId], i.[PublishingPeriodTypeId], ProductionFacilityId, CertificateTypeId, DateOfTransfer
 			HAVING Count(1) > 1
 		)
 		insert into @duplicates (InstrumentId, FirstInstrumentId)
 		SELECT i.InstrumentId, fi.InstrumentId
-		FROM [DAILY_QAECM191].[dbo].Instruments i
-		LEFT JOIN [DAILY_QAECM191].[dbo].InstrumentCertificates ic
+		FROM $(ECMdbname).[dbo].Instruments i
+		LEFT JOIN $(ECMdbname).[dbo].InstrumentCertificates ic
 		ON i.InstrumentId = ic.InstrumentId
 		JOIN FirstInstance fi
 		ON (
@@ -295,17 +304,17 @@ BEGIN TRY
 			AND fi.InstrumentId <> i.InstrumentId
 		)
 		WHERE i.UnderlyingInstrumentId IS NULL --I'll only unify instruments that don't have an underlying instrument
-		AND i.InstrumentId NOT IN ( SELECT InstrumentId FROM [DAILY_QAECM191].[dbo].Authorisations ) --I'll only unify instruments without Authorisations
-		AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyBools ) --I'll only unify instruments without PropertyBools
-		AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyDates ) --I'll only unify instruments without PropertyDates
-		AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyFloats ) --I'll only unify instruments without PropertyFloats
-		AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyIntegers ) --I'll only unify instruments without PropertyIntegers
-		AND i.InstrumentId NOT IN ( SELECT RefId FROM [DAILY_QAECM191].[dbo].Instrument_PropertyStrings ) --I'll only unify instruments without PropertyStrings
+		AND i.InstrumentId NOT IN ( SELECT InstrumentId FROM $(ECMdbname).[dbo].Authorisations ) --I'll only unify instruments without Authorisations
+		AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyBools ) --I'll only unify instruments without PropertyBools
+		AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyDates ) --I'll only unify instruments without PropertyDates
+		AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyFloats ) --I'll only unify instruments without PropertyFloats
+		AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyIntegers ) --I'll only unify instruments without PropertyIntegers
+		AND i.InstrumentId NOT IN ( SELECT RefId FROM $(ECMdbname).[dbo].Instrument_PropertyStrings ) --I'll only unify instruments without PropertyStrings
 
 
-		INSERT INTO [DAILY_QAECM191].[dbo].ELVIZ14214TransactionsBkp ([Id], [TradeDate], [TradeTime], [NotedTime], [UserId], [Amount], [Price], [ReferringId], [TransTypeId], [InstrumentId], [PortfolioId], [StatusId], [ClearingTypeId], [OrderId], [AuthId], [ExchangeId], [BFeeCurrencyId], [CFeeCurrencyId], [CurrencyId], [CurrencyMargin], [PriceBasisId], [TicketNumber], [Comment], [CurrencySourceId], [DeliveryTypeId], [TimeZoneOffset], [TU_Id], [TUP_Id], [PriceUnitId], [OrgVolumeUnitId], [OrgPriceUnitId], [T_BDA_Id], [OrgAmount], [OrgPrice], [ExternalId], [ExternalSourceName], [ContractForm], [ExchangeRate], [ExchangedFrom], [VT_ID], [FromCountryId], [DistrParentId], [DistrAmount], [Markup], [ConfirmedByBroker], [ConfirmedByCounterparty], [Payout], [LowerTrigger], [UpperTrigger], [ExpiryTime], [MarketPriceMultiplicator], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [BalanceAreaId], [TriggerCurrencyId], [SchedulingAccountTypeId], [SchedulingNominationProcedureId], [ToCountryId], [EnvironmentLabelId], [ReplicationId], [IndexedPriceBookTemplateId], [SwapPriceTypeId], [MasterAgreementId], [CashSettlementPeriodContainerId], [SamplingFrom], [SamplingTo], [RiskValue], [GroupField1], [GroupField2], [GroupField3], [CustomCompanyId], [CustomCompanyName], [UnderlyingInstrumentID], [UnderlyingDeliveryTypeId], [TimeZoneId], [UTI], [TimeStampClearedUTC], [TimeStampConfirmationBrokerUTC], [TimeStampConfirmationCounterpartyUTC], [DealCompression], [TerminationDate], [PricebasisToAreaId], [EMIRStatus], [FlexibleTimeSeries], [ContractType], [CapacityId], [ModelTypeId], [LocationId], [InitiatorAggressorId], [RemitReporting], [CertificateLimitFactor], [CtCparty], [Originator], [AuthConfirmed], [OTCBroker], [TradeCompanyId], [DeclareId], [LoadProfileId], [GridPointId], [TraderId], [MinVol], [MaxVol], [FixPrice], [Threshold], [Paid], [DeclaredVolume], [ContractSplitId], [InitialPrice], [CapacityBidVolume], [CapacityBidPrice], [LastUpdatedUTC], [CapacityTradeVolume], [AuctionTypeId], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [CounterpartyTrader], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [LossFactor], [ProcessedAt])
+		INSERT INTO $(ECMdbname).[dbo].ELVIZ14214TransactionsBkp ([Id], [TradeDate], [TradeTime], [NotedTime], [UserId], [Amount], [Price], [ReferringId], [TransTypeId], [InstrumentId], [PortfolioId], [StatusId], [ClearingTypeId], [OrderId], [AuthId], [ExchangeId], [BFeeCurrencyId], [CFeeCurrencyId], [CurrencyId], [CurrencyMargin], [PriceBasisId], [TicketNumber], [Comment], [CurrencySourceId], [DeliveryTypeId], [TimeZoneOffset], [TU_Id], [TUP_Id], [PriceUnitId], [OrgVolumeUnitId], [OrgPriceUnitId], [T_BDA_Id], [OrgAmount], [OrgPrice], [ExternalId], [ExternalSourceName], [ContractForm], [ExchangeRate], [ExchangedFrom], [VT_ID], [FromCountryId], [DistrParentId], [DistrAmount], [Markup], [ConfirmedByBroker], [ConfirmedByCounterparty], [Payout], [LowerTrigger], [UpperTrigger], [ExpiryTime], [MarketPriceMultiplicator], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [BalanceAreaId], [TriggerCurrencyId], [SchedulingAccountTypeId], [SchedulingNominationProcedureId], [ToCountryId], [EnvironmentLabelId], [ReplicationId], [IndexedPriceBookTemplateId], [SwapPriceTypeId], [MasterAgreementId], [CashSettlementPeriodContainerId], [SamplingFrom], [SamplingTo], [RiskValue], [GroupField1], [GroupField2], [GroupField3], [CustomCompanyId], [CustomCompanyName], [UnderlyingInstrumentID], [UnderlyingDeliveryTypeId], [TimeZoneId], [UTI], [TimeStampClearedUTC], [TimeStampConfirmationBrokerUTC], [TimeStampConfirmationCounterpartyUTC], [DealCompression], [TerminationDate], [PricebasisToAreaId], [EMIRStatus], [FlexibleTimeSeries], [ContractType], [CapacityId], [ModelTypeId], [LocationId], [InitiatorAggressorId], [RemitReporting], [CertificateLimitFactor], [CtCparty], [Originator], [AuthConfirmed], [OTCBroker], [TradeCompanyId], [DeclareId], [LoadProfileId], [GridPointId], [TraderId], [MinVol], [MaxVol], [FixPrice], [Threshold], [Paid], [DeclaredVolume], [ContractSplitId], [InitialPrice], [CapacityBidVolume], [CapacityBidPrice], [LastUpdatedUTC], [CapacityTradeVolume], [AuctionTypeId], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [CounterpartyTrader], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [LossFactor], [ProcessedAt])
 		SELECT [Id], [TradeDate], [TradeTime], [NotedTime], [UserId], [Amount], [Price], [ReferringId], [TransTypeId], [InstrumentId], [PortfolioId], [StatusId], [ClearingTypeId], [OrderId], [AuthId], [ExchangeId], [BFeeCurrencyId], [CFeeCurrencyId], [CurrencyId], [CurrencyMargin], [PriceBasisId], [TicketNumber], [Comment], [CurrencySourceId], [DeliveryTypeId], [TimeZoneOffset], [TU_Id], [TUP_Id], [PriceUnitId], [OrgVolumeUnitId], [OrgPriceUnitId], [T_BDA_Id], [OrgAmount], [OrgPrice], [ExternalId], [ExternalSourceName], [ContractForm], [ExchangeRate], [ExchangedFrom], [VT_ID], [FromCountryId], [DistrParentId], [DistrAmount], [Markup], [ConfirmedByBroker], [ConfirmedByCounterparty], [Payout], [LowerTrigger], [UpperTrigger], [ExpiryTime], [MarketPriceMultiplicator], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [BalanceAreaId], [TriggerCurrencyId], [SchedulingAccountTypeId], [SchedulingNominationProcedureId], [ToCountryId], [EnvironmentLabelId], [ReplicationId], [IndexedPriceBookTemplateId], [SwapPriceTypeId], [MasterAgreementId], [CashSettlementPeriodContainerId], [SamplingFrom], [SamplingTo], [RiskValue], [GroupField1], [GroupField2], [GroupField3], [CustomCompanyId], [CustomCompanyName], [UnderlyingInstrumentID], [UnderlyingDeliveryTypeId], [TimeZoneId], [UTI], [TimeStampClearedUTC], [TimeStampConfirmationBrokerUTC], [TimeStampConfirmationCounterpartyUTC], [DealCompression], [TerminationDate], [PricebasisToAreaId], [EMIRStatus], [FlexibleTimeSeries], [ContractType], [CapacityId], [ModelTypeId], [LocationId], [InitiatorAggressorId], [RemitReporting], [CertificateLimitFactor], [CtCparty], [Originator], [AuthConfirmed], [OTCBroker], [TradeCompanyId], [DeclareId], [LoadProfileId], [GridPointId], [TraderId], [MinVol], [MaxVol], [FixPrice], [Threshold], [Paid], [DeclaredVolume], [ContractSplitId], [InitialPrice], [CapacityBidVolume], [CapacityBidPrice], [LastUpdatedUTC], [CapacityTradeVolume], [AuctionTypeId], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [CounterpartyTrader], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [LossFactor], GetUTCDate()
-		FROM [DAILY_QAECM191].[dbo].Transactions
+		FROM $(ECMdbname).[dbo].Transactions
 		WHERE InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
@@ -313,33 +322,33 @@ BEGIN TRY
 			SELECT InstrumentId from @duplicates
 		)
 
-		INSERT INTO [DAILY_QAECM191].[dbo].ELVIZ14214InstrumentsBkp ([InstrumentId], [InstrumentName], [InstrumentShortName], [InstrumentTypeId], [StatusId], [ExecutionVenueId], [CommodityId], [ExpiryOffset], [StripPeriodResolution], [BarrierOptionTypeId], [FromDate], [ToDate], [ExpiryDate], [Strike], [SamplingPeriodId], [PutCall], [Hours], [BaseCurrencyId], [CrossCurrencyId], [BookPriceTypeId], [CapFloorPricingPeriodTypeId], [FutureTypeId], [DeliveryTypeId], [ExpiryTime], [LoadProfileId], [PriceBasisId], [SamplingFrom], [SamplingTo], [SwapPriceTypeId], [TimeZoneId], [UnderlyingInstrumentId], [CurrencyId], [CurrencySourceId], [TU_Id], [PriceUnitId], [Payout], [LowerTrigger], [UpperTrigger], [TriggerCurrencyId], [MarketPriceFactor], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [EnvironmentLabelId], [IndexedPriceBookTemplateId], [PriceBasisToAreaId], [ModelTypeId], [MinVol], [MaxVol], [FixPrice], [Threshold], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [PublishingPeriodTypeId], [ProductionFacilityId], [CertificateTypeId], [DateOfTransfer], [ProcessedAt])
+		INSERT INTO $(ECMdbname).[dbo].ELVIZ14214InstrumentsBkp ([InstrumentId], [InstrumentName], [InstrumentShortName], [InstrumentTypeId], [StatusId], [ExecutionVenueId], [CommodityId], [ExpiryOffset], [StripPeriodResolution], [BarrierOptionTypeId], [FromDate], [ToDate], [ExpiryDate], [Strike], [SamplingPeriodId], [PutCall], [Hours], [BaseCurrencyId], [CrossCurrencyId], [BookPriceTypeId], [CapFloorPricingPeriodTypeId], [FutureTypeId], [DeliveryTypeId], [ExpiryTime], [LoadProfileId], [PriceBasisId], [SamplingFrom], [SamplingTo], [SwapPriceTypeId], [TimeZoneId], [UnderlyingInstrumentId], [CurrencyId], [CurrencySourceId], [TU_Id], [PriceUnitId], [Payout], [LowerTrigger], [UpperTrigger], [TriggerCurrencyId], [MarketPriceFactor], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [EnvironmentLabelId], [IndexedPriceBookTemplateId], [PriceBasisToAreaId], [ModelTypeId], [MinVol], [MaxVol], [FixPrice], [Threshold], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [PublishingPeriodTypeId], [ProductionFacilityId], [CertificateTypeId], [DateOfTransfer], [ProcessedAt])
 		SELECT i.[InstrumentId], [InstrumentName], [InstrumentShortName], [InstrumentTypeId], [StatusId], [ExecutionVenueId], [CommodityId], [ExpiryOffset], [StripPeriodResolution], [BarrierOptionTypeId], [FromDate], [ToDate], [ExpiryDate], [Strike], [SamplingPeriodId], [PutCall], [Hours], [BaseCurrencyId], [CrossCurrencyId], [BookPriceTypeId], [CapFloorPricingPeriodTypeId], [FutureTypeId], [DeliveryTypeId], [ExpiryTime], [LoadProfileId], [PriceBasisId], [SamplingFrom], [SamplingTo], [SwapPriceTypeId], [TimeZoneId], [UnderlyingInstrumentId], [CurrencyId], [CurrencySourceId], [TU_Id], [PriceUnitId], [Payout], [LowerTrigger], [UpperTrigger], [TriggerCurrencyId], [MarketPriceFactor], [SettlementRuleId], [InterconnectorId], [Interruptible], [UserSpecifiedName], [EnvironmentLabelId], [IndexedPriceBookTemplateId], [PriceBasisToAreaId], [ModelTypeId], [MinVol], [MaxVol], [FixPrice], [Threshold], [HistoricContractPriceSeriesId], [HistoricMarketPriceSeriesId], [ReferencePriceSeriesId], [DestinationReferencePriceSeriesId], [PublishingPeriodTypeId], ic.[ProductionFacilityId], ic.[CertificateTypeId], ic.[DateOfTransfer], GetUTCDate()
-		FROM [DAILY_QAECM191].[dbo].Instruments i
-		LEFT JOIN [DAILY_QAECM191].[dbo].InstrumentCertificates ic
+		FROM $(ECMdbname).[dbo].Instruments i
+		LEFT JOIN $(ECMdbname).[dbo].InstrumentCertificates ic
 		ON i.InstrumentId = ic.InstrumentId
 		WHERE i.InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
 
-		UPDATE [DAILY_QAECM191].[dbo].Transactions
+		UPDATE $(ECMdbname).[dbo].Transactions
 		SET InstrumentId = d.FirstInstrumentId
-		FROM [DAILY_QAECM191].[dbo].Transactions t
+		FROM $(ECMdbname).[dbo].Transactions t
 		JOIN @duplicates d
 		ON t.InstrumentId = d.InstrumentId
 
-		UPDATE [DAILY_QAECM191].[dbo].Transactions
+		UPDATE $(ECMdbname).[dbo].Transactions
 		SET UnderlyingInstrumentId = d.FirstInstrumentId
-		FROM [DAILY_QAECM191].[dbo].Transactions t
+		FROM $(ECMdbname).[dbo].Transactions t
 		JOIN @duplicates d
 		ON t.UnderlyingInstrumentId = d.InstrumentId
 
 
-		DELETE [DAILY_QAECM191].[dbo].InstrumentCertificates where InstrumentId IN (
+		DELETE $(ECMdbname).[dbo].InstrumentCertificates where InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
 
-		DELETE [DAILY_QAECM191].[dbo].Instruments where InstrumentId IN (
+		DELETE $(ECMdbname).[dbo].Instruments where InstrumentId IN (
 			SELECT InstrumentId from @duplicates
 		)
 
