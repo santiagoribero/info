@@ -1,0 +1,32 @@
+Windows Registry Editor Version 5.00
+
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\DB-SQL16-W16-01.dev.bradyplc.com\qa]
+"Default DbPath"="D:\\MsSql7\\Data"
+"Provider"="SQLOLEDB"
+"CommandTimeOut"="2000"
+"ElvizPassword"="elviz"
+"ElvizUserName"="DealImport"
+"Elviz_ETRM_HOME"="C:\\Git\\Bradyplc\\etrm"
+"BcrContractDatabaseServer"="NotSpecified"
+"BcrContractDatabaseUserName"="NotSpecified"
+"BcrContractDatabasePassword"="NotSpecified"
+"BcrUrl"="http://netvs-p31/BCRportal"
+"MembershipServiceURL"="https://localhost:4323/authentication/login"
+"UseMembershipAuthentication"=dword:00000000
+"DefaultUser"="EcmDbUser"
+"DefaultPw"="Brady2015"
+"VizEcm"="QAECM192"
+"VizPrices"="QAPrices192"
+"VizSystem"="QAsystem192"
+"ReportingDatabase"="QAReporting192"
+"VizScenarios"="QAScenarios192"
+"VizDatawarehouse"="QADatawareHouse192"
+"Description"=""
+"CliServer"=""
+"UseIntegratedSecurity"=dword:00000000
+
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\Servers]
+@=""
+"Default"="DB-SQL16-W16-01.dev.bradyplc.com\\qa"

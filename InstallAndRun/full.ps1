@@ -1,5 +1,5 @@
- # .\script1.ps1 -ticket ELVIZ-12280-orig -version 2019.2 -download -upgrade -removeLicense -install -run -installServices -startServices
-
+ # .\full.ps1 -ticket ELVIZ-12280-orig -version 2019.2 -download -upgrade -removeLicense -install -run -installServices -startServices
+ # .\full.ps1 -ticket CC-508 -version 2019.1 -download -upgrade -project "etrm-contractclearer"
 
  param (
     [Parameter(Mandatory=$true)][string]$ticket,
@@ -12,7 +12,8 @@
     [switch]$run,
     [switch]$installServices,
     [switch]$startServices,
-    [switch]$uninstall
+    [switch]$uninstall,
+    [string]$project = "etrm"
  )
 
 ###### Validation of running as Admin
@@ -24,15 +25,23 @@ if(!$currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
 }
 
 
-
 $rootPath = "c:\git\"
 $gituser = "santiagoribero"
-$masterBranchVersion = "2019.2"
 
 $forkBranch = "$($ticket)-$($version)"
 $bradyBranch = $version
-if ($bradyBranch -eq $masterBranchVersion) {
-	$bradyBranch = "master"
+if ($project -eq "etrm")
+{
+	if ($bradyBranch -eq "2019.3") {
+		$bradyBranch = "master"
+	}
+}
+else {
+	if (($project -eq "etrm-contractclearer") -or ($project -eq "etrm-clearingreportsviewer")) {
+		if ($bradyBranch -eq "2019.1") {
+			$bradyBranch = "master"
+		}
+	}
 }
 
 $targetdir = "$($rootPath)$($forkBranch)"
@@ -88,14 +97,14 @@ if ($download) {
 	    New-Item -ItemType directory -Path $targetdir
 
 		cd $targetdir
-		$repositoryURL = "https://github.com/$($gituser)/etrm"
+		$repositoryURL = "https://github.com/$($gituser)/$($project)"
 
 		Write-Host "`nCloning $($repositoryURL) $($bradyBranch) branch..." -ForegroundColor Green
 		git clone $repositoryURL -b $bradyBranch
-		cd etrm
+		cd "$($project)"
 
 		Write-Host "`nSetting up upstream branch..." -ForegroundColor Green
-		git remote add upstream https://github.com/bradyplc/etrm
+		git remote add upstream "https://github.com/bradyplc/$($project)"
 		git remote set-url --push upstream no_push
 
 		if ($upgrade) {
@@ -106,10 +115,18 @@ if ($download) {
 
 		Write-Host "`nCreating local branch $($forkBranch)..." -ForegroundColor Green
 		git checkout -b $forkBranch
+	}
+	else {
+		throw "Folder $($targetdir) already exists"
+	}
+}
 
+if(Test-Path -Path $targetdir ){
+	if ($project -eq "etrm")
+	{
 		if ($removeLicense) {
 			Write-Host "`nRemoving licenses..." -ForegroundColor Green
-			Get-ChildItem -Path "$($targetdir)\etrm\Source" -Filter licenses.licx -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object{
+			Get-ChildItem -Path "$($targetdir)\etrm\Source" -Filter licenses.licx -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object {
 			    $content = Get-Content $_.FullName | Where-Object {$_ -NotMatch 'Janus'}
 			    $content | Out-File $_.FullName
 			}
@@ -120,46 +137,40 @@ if ($download) {
 			((Get-Content -path "$($targetdir)\etrm\Scripts\CommonBuildScripts\BuildAll.bat" -Raw) -replace 'call "%~dp0\\buildSM.bat"','REM call "%~dp0\buildSM.bat"') | Set-Content -Path "$($targetdir)\etrm\Scripts\CommonBuildScripts\BuildAll.bat"
 			((Get-Content -path "$($targetdir)\etrm\Scripts\CommonBuildScripts\BuildAll.bat" -Raw) -replace 'if %errorlevel% NEQ 0 exit /B 200','REM if %errorlevel% NEQ 0 exit /B 200') | Set-Content -Path "$($targetdir)\etrm\Scripts\CommonBuildScripts\BuildAll.bat"
 		}
-	}
-	else {
-		throw "Folder $($targetdir) already exists"
-	}
-}
-
-if(Test-Path -Path $targetdir ){
-
-	if ($install) {
-		Write-Host "`nInstalling ETRM..." -ForegroundColor Green
-		# Emake
-		cmd /c "$($targetdir)\etrm\Source\emake" d y
-		cmd /c "$($targetdir)\etrm\Source\emake" vb6
-	}
 
 
-	if ($installServices) {
-		# Install services
-		cd "$($targetdir)\etrm\Integration"
-		.\InstallElvizWCFPublishingService.cmd
-		.\InstallMQListener.cmd
-		.\InstallFileWatcher.cmd
-	}
-
-	if ($run) {
-		Write-Host "`nRunning ETRM Server..." -ForegroundColor Green
-		$env:CD = "$($targetdir)\etrm\bin"
-		if ($startServices) {
-
-			invoke-expression "cmd /c start powershell -Command { $($targetdir)\etrm\Source\emake ls }"
-
-			Write-Host "`nStarting windows services..." -ForegroundColor Green
-			Write-Host "`nPlease press Enter once ETRM Service initialization has finished in the other console..." -ForegroundColor Yellow
-			pause
-			Start-Service -Name "Elviz File Watching Service" #Viz.Integration.Core.FileWatcher.exe
-			Start-Service -Name "Elviz Message Queue Listener Service" #Viz.Integration.Core.MessageQueueListener.exe
-			Start-Service -Name "Elviz WCF Publishing Service" #Viz.Integration.Core.WCFPublisher.exe
+		if ($install) {
+			Write-Host "`nInstalling ETRM..." -ForegroundColor Green
+			# Emake
+			cmd /c "$($targetdir)\etrm\Source\emake" d y
+			cmd /c "$($targetdir)\etrm\Source\emake" vb6
 		}
-		else {
-			cmd /c "$($targetdir)\etrm\Source\emake" ls
+
+
+		if ($installServices) {
+			# Install services
+			cd "$($targetdir)\etrm\Integration"
+			.\InstallElvizWCFPublishingService.cmd
+			.\InstallMQListener.cmd
+			.\InstallFileWatcher.cmd
+		}
+
+		if ($run) {
+			Write-Host "`nRunning ETRM Server..." -ForegroundColor Green
+			$env:CD = "$($targetdir)\etrm\bin"
+			if ($startServices) {
+				invoke-expression "cmd /c start powershell -Command { $($targetdir)\etrm\Source\emake ls }"
+
+				Write-Host "`nStarting windows services..." -ForegroundColor Green
+				Write-Host "`nPlease press Enter once ETRM Service initialization has finished in the other console..." -ForegroundColor Yellow
+				pause
+				Start-Service -Name "Elviz File Watching Service" #Viz.Integration.Core.FileWatcher.exe
+				Start-Service -Name "Elviz Message Queue Listener Service" #Viz.Integration.Core.MessageQueueListener.exe
+				Start-Service -Name "Elviz WCF Publishing Service" #Viz.Integration.Core.WCFPublisher.exe
+			}
+			else {
+				cmd /c "$($targetdir)\etrm\Source\emake" ls
+			}
 		}
 	}
 }

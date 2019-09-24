@@ -1,0 +1,1 @@
+Get-ChildItem -recurse | Select-String -pattern "P46Prices" | group path | select name
