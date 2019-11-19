@@ -59,6 +59,40 @@ if ($run -OR $install -OR $uninstall) {
 	Write-Host "`nVisual Studio 2017 Command Prompt variables set." -ForegroundColor Green
 }
 
+
+if ($download) {
+
+	if(!(Test-Path -Path $targetdir )){
+		Write-Host "`nCreating $($targetdir) folder..." -ForegroundColor Green
+	    New-Item -ItemType directory -Path $targetdir
+
+		cd $targetdir
+		$repositoryURL = "https://github.com/$($gituser)/$($project)"
+
+		Write-Host "`nCloning $($repositoryURL) $($bradyBranch) branch..." -ForegroundColor Green
+		git clone $repositoryURL -b $bradyBranch
+		cd "$($project)"
+
+		Write-Host "`nSetting up upstream branch..." -ForegroundColor Green
+		git remote add upstream "https://github.com/bradyplc/$($project)"
+		git remote set-url --push upstream no_push
+
+		Write-Host "`nCreating local branch $($forkBranch)..." -ForegroundColor Green
+		git checkout -b $forkBranch
+	}
+	else {
+		throw "Folder $($targetdir) already exists"
+	}
+}
+
+if ($upgrade) {
+	cd $targetdir
+	cd "$($project)"
+	Write-Host "`nUpgrading local copy with upstream code..." -ForegroundColor Green
+	git fetch upstream
+	git reset --hard "upstream/$($bradyBranch)"
+}
+
 if ($uninstall) {
 	if(Test-Path -Path $targetdir ){
 		Write-Host "`nUninstalling $($targetdir)..." -ForegroundColor Green
@@ -86,38 +120,6 @@ if ($uninstall) {
 	}
 	else {
 		throw "Folder $($targetdir) does not exist"
-	}
-}
-
-
-if ($download) {
-
-	if(!(Test-Path -Path $targetdir )){
-		Write-Host "`nCreating $($targetdir) folder..." -ForegroundColor Green
-	    New-Item -ItemType directory -Path $targetdir
-
-		cd $targetdir
-		$repositoryURL = "https://github.com/$($gituser)/$($project)"
-
-		Write-Host "`nCloning $($repositoryURL) $($bradyBranch) branch..." -ForegroundColor Green
-		git clone $repositoryURL -b $bradyBranch
-		cd "$($project)"
-
-		Write-Host "`nSetting up upstream branch..." -ForegroundColor Green
-		git remote add upstream "https://github.com/bradyplc/$($project)"
-		git remote set-url --push upstream no_push
-
-		if ($upgrade) {
-			Write-Host "`nUpgrading local copy with upstream code..." -ForegroundColor Green
-			git fetch upstream
-			git reset --hard "upstream/$($bradyBranch)"
-		}
-
-		Write-Host "`nCreating local branch $($forkBranch)..." -ForegroundColor Green
-		git checkout -b $forkBranch
-	}
-	else {
-		throw "Folder $($targetdir) already exists"
 	}
 }
 

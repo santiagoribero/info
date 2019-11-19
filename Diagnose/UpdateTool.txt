@@ -1,0 +1,23 @@
+To debug Brady.Etrm.UpdateTool:
+
+C:\git\ELVIZ-14924-2019.3\etrm\Source\ECS\Clients\EUT\Brady.Etrm.UpdateTool\Program.cs
+
+
+        [STAThread]
+        static void Main()
+        {
+            //#if DEBUG
+            //System.Diagnostics.Debugger.Launch();
+            //#endif
+#if DEBUG
+            while (System.Diagnostics.Debugger.IsAttached == false)
+            {
+                System.Threading.Thread.Sleep(3000);
+            }
+#endif
+
+
+...and then, just after the execution of...
+		int exitCode = RunCommand("Brady.Etrm.UpdateTool.exe", arguments, workingFolder, executionContext.Log, executionContext.CancellationToken);
+
+...attach to Brady.Etrm.UpdateTool.exe

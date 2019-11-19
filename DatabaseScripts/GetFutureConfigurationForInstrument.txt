@@ -1,0 +1,15 @@
+select i.CommodityId, v.VenueId, t.PriceBasisId, pt.PeriodTypeId, fc.*
+from Transactions t
+join Instruments i
+on t.InstrumentId = i.InstrumentId
+LEFT JOIN [DAILY_QAPrices182]..ExecutionVenues ev
+ON ev.ExecutionVenueId = i.ExecutionVenueId
+LEFT JOIN Venues v
+on v.InternalName = ev.ExecutionVenueName
+LEFT join FutureConfiguration fc
+ON (fc.CommodityId = i.CommodityId
+AND fc.VenueId = v.VenueId
+And (fc.PricebasisId = t.PriceBasisId OR (fc.PricebasisId is null and t.PriceBasisId is null)))
+LEFT JOIN PeriodTypes pt
+ON pt.Name = fc.Period
+where t.Id IN ( select MIN (Id) from Transactions t2 where t2.InstrumentId = 3690 )
