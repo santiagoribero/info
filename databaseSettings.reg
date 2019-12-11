@@ -1,7 +1,7 @@
 Windows Registry Editor Version 5.00
 
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\DB-SQL16-W16-01.dev.bradyplc.com\devqa]
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\NETSV-DBS12DEV\DevQA]
 "Default DbPath"="D:\\MsSql7\\Data"
 "Provider"="SQLOLEDB"
 "CommandTimeOut"="2000"
@@ -22,11 +22,11 @@ Windows Registry Editor Version 5.00
 "ReportingDatabase"="DAILY_QAReporting193"
 "VizScenarios"="DAILY_QAScenarios193"
 "VizDatawarehouse"="DAILY_QADatawareHouse193"
-"Description"=""
-"CliServer"=""
+"Environment"=""
+"Version"="2019.3.0.109 "
 "UseIntegratedSecurity"=dword:00000000
 
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\VIZ Risk Management Services\Elviz\Contract Manager\Servers]
 @=""
-"Default"="DB-SQL16-W16-01.dev.bradyplc.com\\devqa"
+"Default"="NETSV-DBS12DEV\\DevQA"
