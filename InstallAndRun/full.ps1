@@ -35,7 +35,7 @@ try
 	$bradyBranch = $version
 	if ($project -eq "etrm")
 	{
-		if ($bradyBranch -eq "2019.3") {
+		if ($bradyBranch -eq "2020.1") {
 			$bradyBranch = "master"
 		}
 	}

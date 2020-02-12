@@ -1,0 +1,16 @@
+select pf.ProdId, p.*
+from Products pf
+JOIN Products p
+ON pf.FromDate = p.FromDate
+and pf.ToDate = p.ToDate
+and pf.TypeID = p.TypeId
+and pf.CommodityId = p.CommodityId
+and pf.ExecutionVenueId = p.ExecutionVenueId
+and pf.AreaId = p.AreaId
+and pf.LoadTypeId = p.LoadTypeId
+and pf.DeliveryTypeId = p.DeliveryTypeId
+and pf.ProductVenueId = p.ProductVenueId
+and ISNULL(pf.IsCall,-1) = ISNULL(p.IsCall,-1)
+and ISNULL(pf.Strike,-1) = ISNULL(p.Strike,-1)
+--and ISNULL(pf.FutureTypeId,-1) <> ISNULL(p.FutureTypeId,-1)
+and pf.ProdID <> p.ProdId
